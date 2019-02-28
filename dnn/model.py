@@ -44,30 +44,17 @@ def initialization(conf):
                 the network.
     """
     # TODO: Task 1.1
-    
-    dims = conf.get('layer_dimensions')
-    L0 = dims[0]
-    L1 = dims[1]
-    L2 = dims[2]
-    L3 = dims[3]
-    sigma1 = 2/L0
-    sigma2 = 2/L1
-    sigma3 = 2/L2
-    W1 = np.random.normal(0,sigma1,(L0,L1))
-    W2 = np.random.normal(0,sigma2,(L1,L2))
-    W3 = np.random.normal(0,sigma3,(L2,L3))
-    B1 = np.zeros((L1,1))
-    B2 = np.zeros((L2,1))
-    B3 = np.zeros((L3,1))
-    
 
-    params = {
-        'W_1': W1, 
-        'W_2': W2,
-        'W_3': W3,
-        'b_1': B1,
-        'b_2': B2,
-        'b_3': B3}
+    params = dict()
+    dims = conf.get('layer_dimensions')
+    num_dims = len(dims)
+    for idx in range(1, num_dims):
+        L = dims[idx-1]
+        Lnx = dims[idx]
+        sigma = 2/L
+        params['W_'+str(idx)] = np.random.normal(0,sigma,(L, Lnx))
+        params['b_'+str(idx)] = np.zeros((Lnx,1))
+
 
     return params
 

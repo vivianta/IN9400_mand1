@@ -38,14 +38,14 @@ def config():
     conf = {}
 
     # Determine what dataset to run on. 'mnist', 'cifar10' and 'svhn' are currently supported.
-    conf['dataset'] = 'mnist'
+    conf['dataset'] = 'cifar10'
     # Relevant datasets will be put in the location data_root_dir/dataset.
     conf['data_root_dir'] = "/tmp/data"
 
     # Number of input nodes. This is determined by the dataset in runtime.
     conf['input_dimension'] = None
     # Number of hidden layers, with the number of nodes in each layer.
-    conf['hidden_dimensions'] = [128, 32]
+    conf['hidden_dimensions'] = [128, 32, 16]
     # Number of classes. This is determined by the dataset in runtime.
     conf['output_dimension'] = None
     # This will be determined in runtime when input_dimension and output_dimension is set.
@@ -57,11 +57,14 @@ def config():
     conf['activation_function'] = 'relu'
     # The number of steps to run before termination of training. One step is one forward->backward
     # pass of a mini-batch
-    conf['max_steps'] = 2000
+    #conf['max_steps'] = 2000
+    conf['max_steps'] = 3000
     # The batch size used in training.
     conf['batch_size'] = 128
     # The step size used by the optimization routine.
-    conf['learning_rate'] = 1.0e-2
+    #conf['learning_rate'] = 1.0e-2
+    conf['learning_rate'] = 1.0e-1
+
 
     # Whether or not to write certain things to stdout.
     conf['verbose'] = False
@@ -134,6 +137,7 @@ def get_data(conf):
     conf['layer_dimensions'] = ([conf['input_dimension']] +
                                 conf['hidden_dimensions'] +
                                 [conf['output_dimension']])
+    print('layer dimentions after loading data: ', conf['layer_dimensions'])
 
     if conf['verbose']:
         print("Train dataset:")
