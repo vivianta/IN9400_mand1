@@ -13,6 +13,7 @@
 """Implementation of convolution forward and backward pass"""
 
 import numpy as np
+from scipy import signal
 
 def conv_layer_forward(input_layer, weight, bias, pad_size=1, stride=1):
     """
@@ -35,9 +36,43 @@ def conv_layer_forward(input_layer, weight, bias, pad_size=1, stride=1):
 
     (batch_size, channels_x, height_x, width_x) = input_layer.shape
     (num_filters, channels_w, height_w, width_w) = weight.shape
-
     assert channels_w == channels_x, (
         "The number of filter channels be the same as the number of input layer channels")
+
+    # with zero-padding for x
+    height_y = int((height_x + 2*pad_size - height_w)/stride +1)
+    width_y = int((width_x + 2*pad_size - width_w)/stride +1)
+    output_layer = np.zeros((batch_size, num_filters, height_y, width_y))
+    K = pad_size # where H == W == 2K+1 for the filter
+    Std = stride
+
+    # with zero-padding for x
+    for i in range(batch_size):
+        for j in range(num_filters):
+            out = np.zeros_like(output_layer[i,j,:,:])
+            for cc in range(channels_x):
+                x = input_layer[i,cc,:,:]
+                filter_j = weight[j,cc,:,:]
+                """    
+                out_cc= signal.convolve2d(x, filter_j, mode="same",boundary='fill', fillvalue=0)
+                out += out_cc
+                """
+                out_cc = np.zeros_like(out)
+                x_pad = np.pad(x,(K,K),'constant', constant_values=(0, 0))
+                for p in range(height_x, Std):
+                    for q in range(width_x, Std):
+                        x_masked = x_pad[p:(p+height_w),q:(q+width_w)]
+                        ypq = np.sum(x_masked*filter_j)
+                        """
+                        for r in range(-1*K,(K+1)):
+                            for s in range(-1*K,(K+1)):
+                                ypq += x_pad[p+K+r,q+K+s]*filter_j[r+K,s+K]
+                                #ypq += x_pad[p+r,q+s]*filter_j[r,s]
+                        """
+                        out_cc[p,q]=ypq
+                out+=out_cc
+
+                output_layer[i,j,:,:] = bias[j]+out
 
     return output_layer
 
